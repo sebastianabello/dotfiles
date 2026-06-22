@@ -1,0 +1,13 @@
+# Secretos y autenticación — NUNCA en git
+gh/.config/gh/hosts.yml
+.ssh/
+.gnupg/
+
+# Backups generados por install.sh
+.dotfiles-backup/
+
+# Sistema / temporales
+.DS_Store
+**/*.swp
+**/*~
+**/.zcompdump*

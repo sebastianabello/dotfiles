@@ -1,0 +1,349 @@
+# starship.toml — configuración mínima y funcional
+
+"$schema" = 'https://starship.rs/config-schema.json'
+
+# 1. TU FORMATO PERSONALIZADO EN DOS LÍNEAS (Expandido con soporte para todos los módulos)
+format = """
+[╭─](bold green)$username$hostname$directory$git_branch$git_commit$git_state$git_status$kubernetes$aws$azure$gcloud$openstack$docker_context$package$buf$bun$c$cpp$cmake$cobol$conda$container$crystal$dart$deno$direnv$dotnet$elixir$elm$erlang$fennel$fortran$gleam$golang$gradle$guix_shell$haskell$haxe$helm$java$julia$kotlin$lua$maven$memory_usage$meson$mojo$nats$netns$nim$nix_shell$nodejs$ocaml$odin$opa$purescript$python$raku$red$rlang$ruby$rust$scala$solidity$spack$sudo$swift$terraform$vlang$typst$vagrant$xmake$zig$status$shlvl$battery
+[╰─](bold green)$character"""
+
+# 2. CONFIGURACIÓN DE TUS MÓDULOS PRINCIPALES (CON FORMATOS CORREGIDOS)
+
+[username]
+style_user = "bold cyan"
+style_root = "bold red"
+show_always = false
+format = "[$user]($style) "
+
+[hostname]
+ssh_only = true
+style = "bold yellow"
+ssh_symbol = " "
+format = "on [$ssh_symbol$hostname]($style) "
+
+[directory]
+style = "bold blue"
+truncation_length = 3
+truncate_to_repo = true
+read_only = " 󰌾"
+truncation_symbol = "…/"
+
+[git_branch]
+symbol = " "
+style = "bold purple"
+format = "on [$symbol$branch]($style) "
+
+[git_status]
+style = "bold red"
+disabled = false
+format = '[✖ $status]($style) '
+
+[character]
+success_symbol = "[❯](bold green) "
+error_symbol = "[❯](bold red) "
+
+# 3. TODOS LOS MÓDULOS Y GLIFOS DEL SEGUNDO ARCHIVO (FUSIONADOS)
+
+[aws]
+symbol = " "
+
+[azure]
+symbol = " "
+
+[battery]
+full_symbol = "󰁹 "
+charging_symbol = "󰂄 "
+discharging_symbol = "󰂃 "
+unknown_symbol = "󰂑 "
+empty_symbol = "󰂎 "
+
+[buf]
+symbol = " "
+
+[bun]
+symbol = " "
+
+[c]
+symbol = " "
+
+[cpp]
+symbol = " "
+
+[cmake]
+symbol = " "
+
+[cobol]
+symbol = " "
+
+[conda]
+symbol = " "
+
+[container]
+symbol = " "
+
+[crystal]
+symbol = " "
+
+[dart]
+symbol = " "
+
+[deno]
+symbol = " "
+
+[direnv]
+symbol = " "
+
+[docker_context]
+symbol = " "
+
+[dotnet]
+symbol = " "
+
+[elixir]
+symbol = " "
+
+[elm]
+symbol = " "
+
+[erlang]
+symbol = " "
+
+[fennel]
+symbol = " "
+
+[fortran]
+symbol = " "
+
+[fossil_branch]
+symbol = " "
+
+[gcloud]
+symbol = "󱇶 "
+format = 'on [$symbol$account(@$project)(\($region\))]($style) '
+
+[gcloud.region_aliases]
+europe-west4 = 'eu-w4'
+
+[gleam]
+symbol = " "
+
+[git_commit]
+tag_symbol = '  '
+
+[golang]
+symbol = " "
+style = "bold cyan"
+
+[gradle]
+symbol = " "
+
+[guix_shell]
+symbol = " "
+
+[haskell]
+symbol = " "
+
+[haxe]
+symbol = " "
+
+[helm]
+symbol = " "
+
+[hg_branch]
+symbol = " "
+
+[java]
+symbol = " "
+
+[julia]
+symbol = " "
+
+[kotlin]
+symbol = " "
+
+[kubernetes]
+disabled = false
+symbol = "󱃾 "
+
+[lua]
+symbol = " "
+
+[maven]
+symbol = " "
+
+[memory_usage]
+symbol = "󰍛 "
+
+[meson]
+symbol = "󰔷 "
+
+[mojo]
+symbol = "󰈸 "
+
+[nats]
+symbol = " "
+
+[netns]
+symbol = "󰛳 "
+
+[nim]
+symbol = " "
+
+[nix_shell]
+symbol = " "
+
+[nodejs]
+symbol = " "
+style = "bold green"
+
+[ocaml]
+symbol = " "
+
+[odin]
+symbol = "󰟢 "
+
+[opa]
+symbol = " "
+
+[openstack]
+symbol = " "
+
+[os.symbols]
+AIX = " "
+AlmaLinux = " "
+Alpaquita = " "
+Alpine = " "
+ALTLinux = " "
+Amazon = " "
+Android = " "
+AOSC = " "
+Arch = " "
+Artix = " "
+Bluefin = " "
+CachyOS = " "
+CentOS = " "
+Debian = " "
+DragonFly = " "
+Elementary = " "
+Emscripten = " "
+EndeavourOS = " "
+Fedora = " "
+FreeBSD = " "
+Garuda = " "
+Gentoo = " "
+HardenedBSD = "󰞌 "
+Illumos = " "
+InstantOS = " "
+Ios = "󰀷 "
+Kali = " "
+Linux = " "
+Mabox = " "
+Macos = " "
+Manjaro = " "
+Mariner = " "
+MidnightBSD = " "
+Mint = " "
+NetBSD = " "
+NixOS = " "
+Nobara = " "
+OpenBSD = " "
+OpenCloudOS = " "
+openEuler = " "
+openSUSE = " "
+OracleLinux = "󰺡 "
+PikaOS = " "
+Pop = " "
+Raspbian = " "
+Redhat = "󱄛 "
+RedHatEnterprise = "󱄛 "
+Redox = "󰀘 "
+RockyLinux = " "
+Solus = " "
+SUSE = " "
+Ubuntu = " "
+Ultramarine = " "
+Unknown = " "
+Uos = " "
+Void = " "
+Windows = "󰍲 "
+Zorin = " "
+
+[package]
+symbol = "󰏗 "
+
+[perl]
+symbol = " "
+
+[php]
+symbol = " "
+
+[pijul_channel]
+symbol = " "
+
+[pixi]
+symbol = "󰏗 "
+
+[pulumi]
+symbol = " "
+
+[purescript]
+symbol = " "
+
+[python]
+symbol = " "
+style = "bold yellow"
+
+[raku]
+symbol = "󱖊 "
+
+[red]
+symbol = "󱍼 "
+
+[rlang]
+symbol = "󰟔 "
+
+[ruby]
+symbol = " "
+
+[rust]
+symbol = "󱘗 "
+style = "bold red"
+
+[scala]
+symbol = " "
+
+[shlvl]
+symbol = "󰹍 "
+
+[singularity]
+symbol = " "
+
+[solidity]
+symbol = " "
+
+[spack]
+symbol = " "
+
+[sudo]
+symbol = " "
+
+[swift]
+symbol = " "
+
+[terraform]
+symbol = " "
+
+[vlang]
+symbol = " "
+
+[typst]
+symbol = " "
+
+[vagrant]
+symbol = " "
+
+[xmake]
+symbol = " "
+
+[zig]
+symbol = " "

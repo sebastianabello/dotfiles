@@ -1,0 +1,15 @@
+// zellij config.kdl — configuración mínima
+default_shell "zsh"
+pane_frames false
+mouse_mode true
+copy_on_select true
+
+keybinds clear-defaults=false {
+    normal {
+        bind "Ctrl a" { SwitchToMode "Tmux"; }
+    }
+}
+
+theme "catppuccin-mocha"
+
+layout_dir "~/.config/zellij/layouts"

@@ -2,7 +2,6 @@
 # =============================================================================
 # setup-debian13.sh
 # Configuración automática de entorno de desarrollo en Debian 13 (Trixie)
-# Autor: Generado para perfil: Ingeniero de Sistemas y Computación
 # Uso: bash setup-debian13.sh
 # =============================================================================
 
@@ -27,7 +26,6 @@ err()     { echo -e "${RED}[✘]${NC} $1" >&2; exit 1; }
 USER_HOME="${HOME}"
 ZSH_CUSTOM="${ZSH_CUSTOM:-$USER_HOME/.oh-my-zsh/custom}"
 GO_VERSION="1.26.4"         # Actualiza según https://go.dev/dl/
-ZSHRC="$USER_HOME/.zshrc"
 
 # Verifica que no se ejecute como root
 [[ "$EUID" -eq 0 ]] && err "No ejecutes este script como root. Usa tu usuario normal (tiene sudo configurado)."
@@ -145,357 +143,6 @@ info "Instalando Starship prompt..."
 curl -sS https://starship.rs/install.sh | sh -s -- --yes
 
 mkdir -p "$USER_HOME/.config"
-cat > "$USER_HOME/.config/starship.toml" <<'EOF'
-# starship.toml — configuración mínima y funcional
-
-"$schema" = 'https://starship.rs/config-schema.json'
-
-# 1. TU FORMATO PERSONALIZADO EN DOS LÍNEAS (Expandido con soporte para todos los módulos)
-format = """
-[╭─](bold green)$username$hostname$directory$git_branch$git_commit$git_state$git_status$kubernetes$aws$azure$gcloud$openstack$docker_context$package$buf$bun$c$cpp$cmake$cobol$conda$container$crystal$dart$deno$direnv$dotnet$elixir$elm$erlang$fennel$fortran$gleam$golang$gradle$guix_shell$haskell$haxe$helm$java$julia$kotlin$lua$maven$memory_usage$meson$mojo$nats$netns$nim$nix_shell$nodejs$ocaml$odin$opa$purescript$python$raku$red$rlang$ruby$rust$scala$solidity$spack$sudo$swift$terraform$vlang$typst$vagrant$xmake$zig$status$shlvl$battery
-[╰─](bold green)$character"""
-
-# 2. CONFIGURACIÓN DE TUS MÓDULOS PRINCIPALES (CON FORMATOS CORREGIDOS)
-
-[username]
-style_user = "bold cyan"
-style_root = "bold red"
-show_always = false
-format = "[$user]($style) "
-
-[hostname]
-ssh_only = true
-style = "bold yellow"
-ssh_symbol = " "
-format = "on [$ssh_symbol$hostname]($style) "
-
-[directory]
-style = "bold blue"
-truncation_length = 3
-truncate_to_repo = true
-read_only = " 󰌾"
-truncation_symbol = "…/"
-
-[git_branch]
-symbol = " "
-style = "bold purple"
-format = "on [$symbol$branch]($style) "
-
-[git_status]
-style = "bold red"
-disabled = false
-format = '[✖ $status]($style) '
-
-[character]
-success_symbol = "[❯](bold green) "
-error_symbol = "[❯](bold red) "
-
-# 3. TODOS LOS MÓDULOS Y GLIFOS DEL SEGUNDO ARCHIVO (FUSIONADOS)
-
-[aws]
-symbol = " "
-
-[azure]
-symbol = " "
-
-[battery]
-full_symbol = "󰁹 "
-charging_symbol = "󰂄 "
-discharging_symbol = "󰂃 "
-unknown_symbol = "󰂑 "
-empty_symbol = "󰂎 "
-
-[buf]
-symbol = " "
-
-[bun]
-symbol = " "
-
-[c]
-symbol = " "
-
-[cpp]
-symbol = " "
-
-[cmake]
-symbol = " "
-
-[cobol]
-symbol = " "
-
-[conda]
-symbol = " "
-
-[container]
-symbol = " "
-
-[crystal]
-symbol = " "
-
-[dart]
-symbol = " "
-
-[deno]
-symbol = " "
-
-[direnv]
-symbol = " "
-
-[docker_context]
-symbol = " "
-
-[dotnet]
-symbol = " "
-
-[elixir]
-symbol = " "
-
-[elm]
-symbol = " "
-
-[erlang]
-symbol = " "
-
-[fennel]
-symbol = " "
-
-[fortran]
-symbol = " "
-
-[fossil_branch]
-symbol = " "
-
-[gcloud]
-symbol = "󱇶 "
-format = 'on [$symbol$account(@$project)(\($region\))]($style) '
-
-[gcloud.region_aliases]
-europe-west4 = 'eu-w4'
-
-[gleam]
-symbol = " "
-
-[git_commit]
-tag_symbol = '  '
-
-[golang]
-symbol = " "
-style = "bold cyan"
-
-[gradle]
-symbol = " "
-
-[guix_shell]
-symbol = " "
-
-[haskell]
-symbol = " "
-
-[haxe]
-symbol = " "
-
-[helm]
-symbol = " "
-
-[hg_branch]
-symbol = " "
-
-[java]
-symbol = " "
-
-[julia]
-symbol = " "
-
-[kotlin]
-symbol = " "
-
-[kubernetes]
-disabled = false
-symbol = "󱃾 "
-
-[lua]
-symbol = " "
-
-[maven]
-symbol = " "
-
-[memory_usage]
-symbol = "󰍛 "
-
-[meson]
-symbol = "󰔷 "
-
-[mojo]
-symbol = "󰈸 "
-
-[nats]
-symbol = " "
-
-[netns]
-symbol = "󰛳 "
-
-[nim]
-symbol = " "
-
-[nix_shell]
-symbol = " "
-
-[nodejs]
-symbol = " "
-style = "bold green"
-
-[ocaml]
-symbol = " "
-
-[odin]
-symbol = "󰟢 "
-
-[opa]
-symbol = " "
-
-[openstack]
-symbol = " "
-
-[os.symbols]
-AIX = " "
-AlmaLinux = " "
-Alpaquita = " "
-Alpine = " "
-ALTLinux = " "
-Amazon = " "
-Android = " "
-AOSC = " "
-Arch = " "
-Artix = " "
-Bluefin = " "
-CachyOS = " "
-CentOS = " "
-Debian = " "
-DragonFly = " "
-Elementary = " "
-Emscripten = " "
-EndeavourOS = " "
-Fedora = " "
-FreeBSD = " "
-Garuda = " "
-Gentoo = " "
-HardenedBSD = "󰞌 "
-Illumos = " "
-InstantOS = " "
-Ios = "󰀷 "
-Kali = " "
-Linux = " "
-Mabox = " "
-Macos = " "
-Manjaro = " "
-Mariner = " "
-MidnightBSD = " "
-Mint = " "
-NetBSD = " "
-NixOS = " "
-Nobara = " "
-OpenBSD = " "
-OpenCloudOS = " "
-openEuler = " "
-openSUSE = " "
-OracleLinux = "󰺡 "
-PikaOS = " "
-Pop = " "
-Raspbian = " "
-Redhat = "󱄛 "
-RedHatEnterprise = "󱄛 "
-Redox = "󰀘 "
-RockyLinux = " "
-Solus = " "
-SUSE = " "
-Ubuntu = " "
-Ultramarine = " "
-Unknown = " "
-Uos = " "
-Void = " "
-Windows = "󰍲 "
-Zorin = " "
-
-[package]
-symbol = "󰏗 "
-
-[perl]
-symbol = " "
-
-[php]
-symbol = " "
-
-[pijul_channel]
-symbol = " "
-
-[pixi]
-symbol = "󰏗 "
-
-[pulumi]
-symbol = " "
-
-[purescript]
-symbol = " "
-
-[python]
-symbol = " "
-style = "bold yellow"
-
-[raku]
-symbol = "󱖊 "
-
-[red]
-symbol = "󱍼 "
-
-[rlang]
-symbol = "󰟔 "
-
-[ruby]
-symbol = " "
-
-[rust]
-symbol = "󱘗 "
-style = "bold red"
-
-[scala]
-symbol = " "
-
-[shlvl]
-symbol = "󰹍 "
-
-[singularity]
-symbol = " "
-
-[solidity]
-symbol = " "
-
-[spack]
-symbol = " "
-
-[sudo]
-symbol = " "
-
-[swift]
-symbol = " "
-
-[terraform]
-symbol = " "
-
-[vlang]
-symbol = " "
-
-[typst]
-symbol = " "
-
-[vagrant]
-symbol = " "
-
-[xmake]
-symbol = " "
-
-[zig]
-symbol = " "
-EOF
 
 log "Starship configurado."
 
@@ -512,28 +159,8 @@ ZELLIJ_URL="https://github.com/zellij-org/zellij/releases/latest/download/zellij
 curl -fsSL "$ZELLIJ_URL" | tar -xz -C /tmp
 sudo install -m 0755 /tmp/zellij /usr/local/bin/zellij
 
-mkdir -p "$USER_HOME/.config/zellij"
-cat > "$USER_HOME/.config/zellij/config.kdl" <<'EOF'
-// zellij config.kdl — configuración mínima
-default_shell "zsh"
-pane_frames false
-mouse_mode true
-copy_on_select true
-
-keybinds clear-defaults=false {
-    normal {
-        bind "Ctrl a" { SwitchToMode "Tmux"; }
-    }
-}
-
-theme "catppuccin-mocha"
-
-layout_dir "~/.config/zellij/layouts"
-EOF
 
 log "Zellij instalado y configurado."
-# El .zshrc se genera en la sección 3, después de conda init zsh,
-# para que nuestro archivo sea el último en escribirse.
 
 # ─────────────────────────────────────────────────────────────────────────────
 # SECCIÓN 3: PYTHON — uv + Miniconda
@@ -568,7 +195,7 @@ info "Aceptando Terms of Service de los canales de Anaconda..."
 "$CONDA" tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main || true
 "$CONDA" tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r    || true
 
-# Inicializa conda (modifica .zshrc temporalmente — lo sobrescribiremos luego)
+# Inicializa conda (añade su bloque al .zshrc — install.sh lo sobreescribirá con dotfiles)
 "$CONDA" init zsh
 "$CONDA" config --set auto_activate_base false
 
@@ -581,154 +208,8 @@ info "Creando entorno 'ai' para IA/ML (python 3.12 + stack ML)..."
 log "Entorno 'ai' listo. Actívalo con: conda activate ai"
 log "Python configurado."
 
-# ── .zshrc completo (se escribe aquí, DESPUÉS de conda init) ─────────────────
-# conda init ya escribió su bloque en .zshrc; lo sobreescribimos con nuestra
-# config completa que incluye el bloque de conda al final.
-info "Generando .zshrc definitivo..."
-cat > "$ZSHRC" <<'ZSHRC_EOF'
-# ──────────────────────────────────────────────────────────────────────────────
-# .zshrc — Configuración principal de zsh
-# ──────────────────────────────────────────────────────────────────────────────
+# .zshrc gestionado por dotfiles via install.sh
 
-# ── PATH — todos los exports primero, antes de cualquier eval ────────────────
-export PATH="$HOME/.local/bin:$PATH"                      # uv, zoxide, tldr
-export PATH="$HOME/.cargo/bin:$PATH"                      # rust/cargo tools
-export PATH="/usr/local/go/bin:$HOME/go/bin:$PATH"        # go
-export GOROOT="/usr/local/go"
-export GOPATH="$HOME/go"
-export BUN_INSTALL="$HOME/.bun"
-export PATH="$BUN_INSTALL/bin:$PATH"                      # bun
-export PNPM_HOME="$HOME/.local/share/pnpm"
-case ":$PATH:" in
-  *":$PNPM_HOME:"*) ;;
-  *) export PATH="$PNPM_HOME:$PATH" ;;
-esac
-export FNM_PATH="$HOME/.local/share/fnm"
-if [ -d "$FNM_PATH" ]; then
-    export PATH="$FNM_PATH:$PATH"
-fi
-
-# ── Rust / Cargo env ─────────────────────────────────────────────────────────
-[ -f "$HOME/.cargo/env" ] && source "$HOME/.cargo/env"
-
-# ── Oh My Zsh ────────────────────────────────────────────────────────────────
-export ZSH="$HOME/.oh-my-zsh"
-ZSH_THEME=""  # Starship gestiona el prompt
-
-plugins=(
-    git
-    zsh-autosuggestions
-    zsh-syntax-highlighting
-    zsh-completions
-    docker
-    docker-compose
-    sudo
-    direnv
-)
-
-source "$ZSH/oh-my-zsh.sh"
-
-# ── Evals de herramientas (PATH ya completo arriba) ──────────────────────────
-
-# Starship prompt
-eval "$(starship init zsh)"
-
-# Zoxide (cd inteligente)
-eval "$(zoxide init zsh --cmd cd)"
-
-# fnm (Node.js version manager)
-if [ -d "$FNM_PATH" ]; then
-    eval "$(fnm env --use-on-cd --shell zsh)"
-fi
-
-# fzf
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
-export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-export FZF_DEFAULT_OPTS='--height 40% --layout=reverse --border'
-
-# ── Aliases modernos ─────────────────────────────────────────────────────────
-# Navegación
-alias ls='eza --icons --group-directories-first'
-alias ll='eza -lah --icons --git --group-directories-first'
-alias lt='eza --tree --icons --level=2'
-alias lta='eza --tree --icons --level=3 -a'
-
-# Búsqueda y lectura
-alias cat='bat --style=auto'
-alias find='fd'
-alias grep='rg'
-alias top='btop'
-
-# Git
-alias g='git'
-alias lg='lazygit'
-alias gst='git status'
-alias glog='git log --oneline --graph --decorate'
-
-# Docker
-alias d='docker'
-alias dc='docker compose'
-alias lzd='lazydocker'
-
-# Productividad
-alias zj='zellij'
-alias ..='cd ..'
-alias ...='cd ../..'
-alias ....='cd ../../..'
-alias cls='clear'
-alias path='echo $PATH | tr ":" "\n"'
-alias reload='source ~/.zshrc'
-
-# Python / uv
-alias py='python3'
-alias venv='uv venv'
-alias pip='uv pip'
-
-# Herramientas
-alias tldr='tldr --color always'
-
-# ── Funciones útiles ─────────────────────────────────────────────────────────
-mkcd() { mkdir -p "$1" && cd "$1"; }
-
-extract() {
-    case "$1" in
-        *.tar.bz2)  tar xjf "$1" ;;
-        *.tar.gz)   tar xzf "$1" ;;
-        *.tar.xz)   tar xJf "$1" ;;
-        *.bz2)      bunzip2 "$1" ;;
-        *.gz)       gunzip "$1"  ;;
-        *.tar)      tar xf "$1"  ;;
-        *.zip)      unzip "$1"   ;;
-        *.7z)       7z x "$1"    ;;
-        *)          echo "Formato desconocido: $1" ;;
-    esac
-}
-
-fcd() {
-    local dir
-    dir=$(fd --type d --hidden --follow --exclude .git 2>/dev/null | fzf +m) && cd "$dir"
-}
-
-gclone() { git clone "$1" && cd "$(basename "$1" .git)"; }
-
-# ── direnv hook ──────────────────────────────────────────────────────────────
-eval "$(direnv hook zsh)"
-
-# ── Miniconda — bloque gestionado por conda init ──────────────────────────────
-# shellcheck source=/dev/null
-__conda_setup="$('/home/$(whoami)/miniconda3/bin/conda' 'shell.zsh' 'hook' 2>/dev/null)"
-if [ $? -eq 0 ]; then
-    eval "$__conda_setup"
-elif [ -f "$HOME/miniconda3/etc/profile.d/conda.sh" ]; then
-    . "$HOME/miniconda3/etc/profile.d/conda.sh"
-fi
-unset __conda_setup
-# conda auto_activate_base = false → no activa 'base' al abrir terminal
-
-ZSHRC_EOF
-
-log ".zshrc generado."
 
 # ─────────────────────────────────────────────────────────────────────────────
 # SECCIÓN 4: NODE.JS — fnm + pnpm + bun
@@ -877,45 +358,6 @@ sudo systemctl start docker
 log "Docker $(docker --version) instalado."
 log "Docker Compose $(docker compose version) instalado."
 warn "IMPORTANTE: Cierra sesión y vuelve a entrar para usar Docker sin sudo."
-
-# ── Ejemplo docker-compose ────────────────────────────────────────────────────
-mkdir -p "$USER_HOME/docker-examples/webapp"
-cat > "$USER_HOME/docker-examples/webapp/compose.yml" <<'EOF'
-# compose.yml — Stack mínimo: app web + PostgreSQL
-services:
-  app:
-    image: node:lts-alpine
-    working_dir: /app
-    volumes:
-      - ./app:/app
-    command: sh -c "npm install && npm start"
-    ports:
-      - "3000:3000"
-    environment:
-      DATABASE_URL: postgres://user:password@db:5432/mydb
-    depends_on:
-      db:
-        condition: service_healthy
-
-  db:
-    image: postgres:16-alpine
-    environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: mydb
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U user -d mydb"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
-volumes:
-  pgdata:
-EOF
-
-log "Ejemplo compose.yml creado en ~/docker-examples/webapp/"
 
 # ─────────────────────────────────────────────────────────────────────────────
 # SECCIÓN 7b: CLI STACK MODERNO
@@ -1099,66 +541,7 @@ else
 fi
 
 
-# ── Configuración de Ghostty ─────────────────────────────────────────────────
-mkdir -p "$USER_HOME/.config/ghostty"
-cat > "$USER_HOME/.config/ghostty/config" <<'EOF'
-# ─────────────────────────────────────────────────────
-# Ghostty config — stack de desarrollo en Debian 13
-# ─────────────────────────────────────────────────────
-
-# Fuente — usar la Nerd Font instalada
-# Opciones: "JetBrainsMono Nerd Font", "FiraCode Nerd Font", "CaskaydiaCove Nerd Font"
-font-family = "JetBrainsMono Nerd Font"
-font-size = 10
-font-feature = calt
-font-feature = liga
-
-# Tema de color
-
-
-# Ventana
-window-padding-x = 10
-window-padding-y = 8
-window-decoration = none
-unfocused-split-opacity = 0.9
-
-# Shell
-command = /usr/bin/zsh
-
-# Cursor
-cursor-style = block
-cursor-style-blink = false
-
-# Performance
-window-vsync = true
-
-# Integración con shell (habilita OSC 133 para prompts)
-shell-integration = zsh
-shell-integration-features = cursor,sudo,title
-
-# Copiar al seleccionar
-copy-on-select = clipboard
-
-# URLs clickeables
-link-url = true
-
-# Scrollback
-scrollback-limit = 10000
-
-# Keybindings útiles
-# Ghostty usa Ctrl+Shift por defecto para no colisionar con Zellij
-keybind = ctrl+shift+c=copy_to_clipboard
-keybind = ctrl+shift+v=paste_from_clipboard
-keybind = ctrl+shift+t=new_tab
-keybind = ctrl+shift+w=close_surface
-keybind = ctrl+shift+equal=increase_font_size:1
-keybind = ctrl+shift+minus=decrease_font_size:1
-keybind = ctrl+shift+0=reset_font_size
-EOF
-
-log "Ghostty configurado en ~/.config/ghostty/config"
-info "Fuente configurada: JetBrainsMono Nerd Font (cámbiala en ~/.config/ghostty/config)"
-info "Para cambiar tema: edita 'theme = ' — ghostty incluye catppuccin, gruvbox, tokyo-night, etc."
+log "Ghostty instalado y dotfiles configurados via install.sh"
 
 # ─────────────────────────────────────────────────────────────────────────────
 # SECCIÓN 10: Visual Studio Code + Brave Browser
@@ -1195,6 +578,20 @@ log "Visual Studio Code $(code --version | head -n 1) instalado."
 log "Brave Browser instalado."
 
 # ─────────────────────────────────────────────────────────────────────────────
+# DOTFILES — Instalar configuraciones via GNU Stow
+# ─────────────────────────────────────────────────────────────────────────────
+section "Instalando dotfiles via GNU Stow..."
+
+DOTFILES_DIR="$(dirname "$(realpath "$0")")"
+if [[ -f "$DOTFILES_DIR/install.sh" ]]; then
+    bash "$DOTFILES_DIR/install.sh" --all
+    log "Dotfiles instalados correctamente."
+else
+    warn "install.sh no encontrado en $DOTFILES_DIR"
+    warn "Clona el repo de dotfiles y ejecuta: ./install.sh --all"
+fi
+
+# ─────────────────────────────────────────────────────────────────────────────
 # RESUMEN FINAL
 # ─────────────────────────────────────────────────────────────────────────────
 section "✅ Instalación completa"
@@ -1219,21 +616,17 @@ echo -e "  1. ${BOLD}Cierra sesión y vuelve a entrar${NC} para:"
 echo -e "     - Que Docker funcione sin sudo (grupo docker)"
 echo -e "     - Que zsh sea tu shell activo"
 echo ""
-echo -e "  2. ${BOLD}Configura tu identidad en git:${NC}"
-echo -e "     git config --global user.name \"Tu Nombre\""
-echo -e "     git config --global user.email \"tu@email.com\""
-echo ""
-echo -e "  3. ${BOLD}Actualiza GO_VERSION${NC} en este script a la versión más reciente:"
+echo -e "  2. ${BOLD}Actualiza GO_VERSION${NC} en este script a la versión más reciente:"
 echo -e "     https://go.dev/dl/"
 echo ""
-echo -e "  4. ${BOLD}Para activar conda:${NC}"
+echo -e "  3. ${BOLD}Para activar conda:${NC}"
 echo -e "     source ~/miniconda3/etc/profile.d/conda.sh"
 echo -e "     conda activate ai"
 echo ""
-echo -e "  5. ${BOLD}Selecciona la fuente en Ghostty${NC} (ya configurada):"
+echo -e "  4. ${BOLD}Selecciona la fuente en Ghostty${NC} (ya configurada):"
 echo -e "     Abre Ghostty → la fuente JetBrainsMono Nerd Font se aplica automáticamente."
 echo -e "     Para cambiarla: edita ~/.config/ghostty/config → font-family"
 echo ""
-echo -e "  6. ${BOLD}Abre una nueva terminal Ghostty${NC} (o ejecuta: exec zsh) para activar todo."
+echo -e "  5. ${BOLD}Abre una nueva terminal Ghostty${NC} (o ejecuta: exec zsh) para activar todo."
 echo ""
 echo -e "${CYAN}Happy hacking! 🚀${NC}"
