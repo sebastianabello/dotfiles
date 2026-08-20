@@ -45,9 +45,6 @@ source "$ZSH/oh-my-zsh.sh"
 # Starship prompt
 eval "$(starship init zsh)"
 
-# Zoxide (cd inteligente)
-eval "$(zoxide init zsh --cmd cd)"
-
 # fnm (Node.js version manager)
 if [ -d "$FNM_PATH" ]; then
     eval "$(fnm env --use-on-cd --shell zsh)"
@@ -140,3 +137,6 @@ unset __conda_setup
 
 # bun completions
 [ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
+
+# Zoxide (cd inteligente)
+eval "$(zoxide init zsh --cmd cd)"
