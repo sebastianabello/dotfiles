@@ -35,12 +35,20 @@ if [[ "${ID:-}" != "debian" || "${VERSION_CODENAME:-}" != "trixie" ]]; then
     sleep 5
 fi
 
+# El stack completo ocupa varios GB (conda, rust, docker, fuentes, plugins)
+FREE_GB=$(df -Pk "$HOME" | awk 'NR==2 {print int($4/1024/1024)}')
+if [[ "$FREE_GB" -lt 10 ]]; then
+    warn "Solo hay ${FREE_GB} GB libres en \$HOME; se recomiendan ≥ 10 GB. Continúa en 5 s (Ctrl+C para cancelar)..."
+    sleep 5
+fi
+
 case "$(uname -m)" in
     x86_64)        ARCH="x86_64";  ARCH_ALT="amd64" ;;
     aarch64|arm64) ARCH="aarch64"; ARCH_ALT="arm64" ;;
     *) err "Arquitectura no soportada: $(uname -m)" ;;
 esac
 
+USER="${USER:-$(id -un)}"   # puede no estar definido en contenedores
 USER_HOME="${HOME}"
 ZSH_CUSTOM="${ZSH_CUSTOM:-$USER_HOME/.oh-my-zsh/custom}"
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -184,8 +192,8 @@ fi
 
 if ! "$CONDA" env list | grep -qE '^ai\s'; then
     info "Creando entorno 'ai' (python 3.12 + stack ML)..."
-    "$CONDA" create -y -n ai python=3.12 --channel conda-forge \
-        numpy pandas scikit-learn matplotlib seaborn jupyter ipykernel \
+    "$CONDA" create -y -n ai --channel conda-forge \
+        python=3.12 numpy pandas scikit-learn matplotlib seaborn jupyter ipykernel \
         || warn "No se pudo crear 'ai'. Créalo a mano: conda create -n ai python=3.12"
 fi
 log "Python listo."
@@ -210,7 +218,7 @@ fi
 log "Node $(node --version) con fnm."
 
 export PNPM_HOME="$USER_HOME/.local/share/pnpm"
-export PATH="$PNPM_HOME:$PATH"
+export PATH="$PNPM_HOME/bin:$PNPM_HOME:$PATH"
 if ! has pnpm; then
     info "Instalando pnpm (standalone)..."
     curl -fsSL https://get.pnpm.io/install.sh | env PNPM_HOME="$PNPM_HOME" SHELL="$(command -v zsh)" sh -s --
@@ -290,7 +298,11 @@ if ! has docker; then
     sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 fi
 sudo usermod -aG docker "$USER"
-sudo systemctl enable --now docker
+if [[ -d /run/systemd/system ]]; then
+    sudo systemctl enable --now docker
+else
+    warn "Sin systemd (¿contenedor/WSL?): no se habilita el servicio docker."
+fi
 log "$(docker --version)"
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -431,7 +443,10 @@ fi
 if has nvim && [[ -d "$USER_HOME/.config/nvim" ]]; then
     info "Preparando Neovim (plugins, LSP y parsers; puede tardar)..."
     nvim --headless "+Lazy! sync" +qa || warn "Falló Lazy sync; ábrelo con nvim y ejecuta :Lazy sync"
-    nvim --headless "+MasonToolsInstallSync" +qa || warn "Falló la instalación de herramientas de mason"
+    for attempt in 1 2; do
+        nvim --headless "+MasonToolsInstallSync" +qa && break
+        warn "Mason: intento ${attempt} fallido"
+    done
     nvim --headless "+TSInstallAll" +qa || warn "Falló la instalación de parsers de treesitter"
 fi
 

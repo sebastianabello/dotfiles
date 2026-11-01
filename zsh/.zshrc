@@ -19,7 +19,7 @@ path=(
     "$HOME/.cargo/bin"        # rust/cargo tools
     "$GOROOT/bin" "$GOPATH/bin"
     "$BUN_INSTALL/bin"
-    "$PNPM_HOME"
+    "$PNPM_HOME/bin" "$PNPM_HOME"   # pnpm ≥ 11 instala en $PNPM_HOME/bin
     "$FNM_PATH"
     $path
 )
