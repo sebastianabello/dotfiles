@@ -1,259 +1,171 @@
 # Dotfiles — Debian 13 Trixie
 
-Configuración personal gestionada con **GNU Stow**. Cada herramienta vive en su propio módulo; un solo script crea todos los symlinks con backup automático.
+Configuración personal gestionada con **GNU Stow**. Cada herramienta vive en su propio módulo; un script crea los symlinks con backup automático y otro instala todo el software.
 
-Sistema base: **Debian 13 (Trixie)** · Arquitectura: `x86_64`
+Sistema base: **Debian 13 (Trixie)** · Arquitecturas: `x86_64` y `arm64`
 
 ---
 
 ## Inicio rápido
 
+### Máquina nueva (un solo comando)
+
 ```sh
-# En una máquina nueva: clonar e instalar todo
-git clone https://github.com/sebastianabello/dotfiles.git
-cd dotfiles
-
-# 1. Instalar todo el software del sistema
-bash setup-debian13.sh
-
-# 2. (O solo los dotfiles, si el software ya está instalado)
-./install.sh --all
+curl -fsSL https://raw.githubusercontent.com/sebastianabello/dotfiles/main/bootstrap.sh | bash
 ```
+
+Instala `git`, `curl` y `stow`, clona el repo en `~/.dotfiles` y ejecuta `setup-debian13.sh` (software + dotfiles + Neovim).
+
+### Con el repo ya clonado
+
+```sh
+make setup          # software + dotfiles + Neovim  (= bash setup-debian13.sh)
+make install        # solo los dotfiles             (= ./install.sh --all)
+make help           # todas las tareas
+```
+
+`setup-debian13.sh` es **idempotente**: se puede repetir y omite lo ya instalado.
+
+### Pasos manuales tras instalar
+
+1. Cerrar sesión y volver a entrar (grupo `docker` y zsh como shell).
+2. `gh auth login` y `gh auth setup-git` (credenciales de GitHub).
+3. Abrir una terminal nueva (o `exec zsh`).
 
 ---
 
-## Gestión de dotfiles con install.sh
+## install.sh
 
 ```sh
-./install.sh --all              # instalar todos los módulos
-./install.sh zsh git starship   # instalar módulos específicos
-./install.sh --dry-run --all    # previsualizar sin cambios
-./install.sh --help             # ver módulos disponibles
+./install.sh --all                # instalar todos los módulos
+./install.sh zsh git nvim         # módulos concretos
+./install.sh --dry-run --all      # simular sin cambios
+./install.sh --all --uninstall    # quitar los symlinks (stow -D)
+./install.sh --help               # módulos disponibles
 ```
 
-- **Backup automático**: si el archivo de destino ya existe, se mueve a `~/.dotfiles-backup/YYYYMMDD_HHMMSS/` antes de crear el symlink.
-- **Idempotente**: se puede ejecutar varias veces sin crear backups redundantes (detecta symlinks ya gestionados).
-- **Motor**: [GNU Stow](https://www.gnu.org/software/stow/) — la estructura de cada módulo espeja la ruta relativa a `$HOME`.
+- **Backup automático**: un archivo real existente se mueve a `~/.dotfiles-backup/YYYYMMDD_HHMMSS/`. Los symlinks que apuntan a otro clon de este repo se reemplazan directamente.
+- **Errores aislados**: si un módulo falla, se informa y se continúa con los demás.
+- **Motor**: [GNU Stow](https://www.gnu.org/software/stow/); cada módulo espeja la ruta relativa a `$HOME`.
+
+> Nota: `--dry-run` puede avisar de conflictos que desaparecen en la instalación real (la simulación no retira los symlinks viejos).
 
 ---
 
-## Estructura del repositorio
+## Estructura
 
 ```
 dotfiles/
-├── install.sh                    ← orquestador de symlinks
-├── setup-debian13.sh             ← instala todo el software del sistema
+├── bootstrap.sh            ← instalación en una máquina nueva
+├── setup-debian13.sh       ← instala todo el software
+├── install.sh              ← enlaza los dotfiles (stow)
+├── Makefile                ← atajos: install, setup, lint, nvim-sync...
+├── .github/workflows/      ← CI: shellcheck, zsh -n, stylua
 │
-├── zsh/
-│   ├── .zshrc                    → ~/.zshrc
-│   └── .zshenv                   → ~/.zshenv
-│
-├── git/
-│   └── .gitconfig                → ~/.gitconfig
-│
-├── starship/
-│   └── .config/
-│       └── starship.toml         → ~/.config/starship.toml
-│
-├── ghostty/
-│   └── .config/
-│       └── ghostty/
-│           └── config            → ~/.config/ghostty/config
-│
-├── zellij/
-│   └── .config/
-│       └── zellij/
-│           └── config.kdl        → ~/.config/zellij/config.kdl
-│
-├── lazygit/
-│   └── .config/
-│       └── lazygit/
-│           └── config.yml        → ~/.config/lazygit/config.yml
-│
-├── btop/
-│   └── .config/
-│       └── btop/
-│           └── btop.conf         → ~/.config/btop/btop.conf
-│
-├── glow/
-│   └── .config/
-│       └── glow/
-│           └── glow.yml          → ~/.config/glow/glow.yml
-│
-└── gh/
-    └── .config/
-        └── gh/
-            └── config.yml        → ~/.config/gh/config.yml
+├── zsh/        .zshrc  .zshenv
+├── git/        .gitconfig
+├── nvim/       .config/nvim/  (Lua + lazy.nvim)
+├── starship/   .config/starship.toml
+├── ghostty/    .config/ghostty/config.ghostty
+├── zellij/     .config/zellij/{config.kdl, layouts/dev.kdl}
+├── lazygit/    .config/lazygit/config.yml
+├── btop/       .config/btop/btop.conf
+├── glow/       .config/glow/glow.yml
+└── gh/         .config/gh/config.yml
 ```
 
 > `~/.config/gh/hosts.yml` (tokens OAuth) está excluido por `.gitignore`.
+> Configuración propia de cada máquina (sin versionar): `~/.zshrc.local`.
+
+### Añadir un módulo
+
+```sh
+mkdir -p mimodulo/.config/mimodulo
+cp ~/.config/mimodulo/* mimodulo/.config/mimodulo/
+./install.sh mimodulo
+```
 
 ---
 
-## Añadir un módulo nuevo
+## Neovim (Lua)
 
-```sh
-# Ejemplo: añadir configuración de neovim
-mkdir -p dotfiles/neovim/.config/nvim
-cp -r ~/.config/nvim/* dotfiles/neovim/.config/nvim/
-./install.sh neovim
+Configuración modular con [lazy.nvim](https://github.com/folke/lazy.nvim), que se instala solo en el primer arranque. Requiere Neovim ≥ 0.11 (el script lo instala si hace falta).
+
+```
+nvim/.config/nvim/
+├── init.lua
+├── lazy-lock.json                  ← versiones fijadas de los plugins
+└── lua/
+    ├── config/   options · keymaps · autocmds · lazy
+    └── plugins/  colorscheme · treesitter · lsp · completion · format
+                  telescope · ui · git
 ```
 
-La estructura dentro del módulo debe esperar la ruta relativa a `$HOME`. Stow crea el symlink automáticamente.
+| Área | Plugin |
+|---|---|
+| Tema | catppuccin (mocha) |
+| LSP | mason + nvim-lspconfig (`lua_ls`, `bashls`, `pyright`, `ts_ls`, `jsonls`) |
+| Completado | blink.cmp |
+| Formato | conform (stylua, shfmt, prettier, ruff) al guardar |
+| Sintaxis | nvim-treesitter (rama `main`) |
+| Búsqueda | telescope + fzf-native |
+| UI | lualine · which-key · neo-tree · gitsigns |
+
+Teclas (líder = `Espacio`): `<leader>ff` archivos · `<leader>fg` texto · `<leader>e` explorador · `gd` definición · `<leader>ca` acciones · `<leader>rn` renombrar · `gc` comentar.
+
+Instalación desatendida: `make nvim-sync`.
+
+---
+
+## Shell
+
+- **PATH sin duplicados** (`typeset -U`), orden: `~/.local/bin` › `~/.cargo/bin` › Go › bun › pnpm › fnm.
+- **fzf**: `Ctrl+R` historial · `Ctrl+T` archivos · `Alt+C` directorios.
+- **conda** con carga diferida (no ralentiza el arranque).
+- Cada herramienta se activa solo si está instalada.
+
+### Aliases
+
+| Alias | Comando |
+|---|---|
+| `ls` `ll` `lt` | `eza` con iconos |
+| `cat` | `bat --paging=never` |
+| `ff` · `rgi` | `fd` · `rg -i` |
+| `v` | `nvim` |
+| `g` `lg` `lzd` | `git` · `lazygit` · `lazydocker` |
+| `d` `dc` | `docker` · `docker compose` |
+| `zj` | `zellij` |
+| `py` `venv` `uvp` | `python3` · `uv venv` · `uv pip` |
+| `reload` | `exec zsh` |
+
+`find`, `grep` y `pip` **no** están aliasados, para no romper scripts POSIX.
+
+### Funciones
+
+`mkcd <dir>` · `extract <archivo>` · `fcd` (cd con fzf) · `gclone <url>`
+
+---
+
+## Terminal y multiplexor
+
+- **Ghostty**: tema Catppuccin Mocha, JetBrainsMono Nerd Font 12, cursor bloque.
+- **Zellij**: prefijo `Ctrl b` (modo tmux), `Ctrl g` bloquea. Layout por defecto `dev` (editor + terminal + lazygit).
 
 ---
 
 ## Software instalado por setup-debian13.sh
 
-### Shell
-
-| Herramienta | Función |
+| Categoría | Herramientas |
 |---|---|
-| `zsh` | Shell principal |
-| `oh-my-zsh` | Framework de plugins |
-| `zsh-autosuggestions` | Sugerencias por historial |
-| `zsh-syntax-highlighting` | Coloreado en tiempo real |
-| `zsh-completions` | Completado ampliado |
-| `starship` | Prompt personalizado de dos líneas |
-| `zellij` | Multiplexor de terminal (modo Ctrl+a) |
+| Shell | zsh, oh-my-zsh (+autosuggestions, syntax-highlighting, completions), starship, zellij |
+| Editores | Neovim, Visual Studio Code |
+| Python | uv, miniconda3 (entorno `ai`, Python 3.12 + stack ML) |
+| Node.js | fnm (LTS), pnpm, bun |
+| Go | última versión oficial en `/usr/local/go` + gopls, dlv, golangci-lint |
+| Rust | rustup (stable/beta/nightly), clippy, rustfmt, rust-analyzer, cargo-audit/outdated/watch/expand/nextest |
+| Docker | Engine + Compose v2 (repo oficial) |
+| CLI | eza, fd, bat, ripgrep, fzf, zoxide, yazi, lazygit, lazydocker, delta, btop, tldr, glow |
+| Fuentes | JetBrainsMono, FiraCode, CascadiaCode (Nerd Fonts) |
+| Apps | Ghostty (repo `debian.griffo.io`), Brave |
 
-### Python
-
-| Herramienta | Función |
-|---|---|
-| `uv` | Gestor moderno de paquetes y proyectos |
-| `miniconda3` | Entorno `ai` con Python 3.12 + stack ML |
-
-```sh
-uv init mi-proyecto && cd mi-proyecto
-uv add requests fastapi
-uv run main.py
-
-conda activate ai   # numpy, pandas, scikit-learn, matplotlib, jupyter
-```
-
-### Node.js
-
-| Herramienta | Función |
-|---|---|
-| `fnm` | Gestor de versiones de Node |
-| `pnpm` | Package manager principal |
-| `bun` | Runtime y tooling moderno |
-
-```sh
-fnm install --lts && fnm default lts-latest
-pnpm create vite mi-app
-bun run script.ts
-```
-
-### Go
-
-Instalado desde tarball oficial en `/usr/local/go`.
-
-| Variable | Valor |
-|---|---|
-| `GOROOT` | `/usr/local/go` |
-| `GOPATH` | `~/go` |
-
-Herramientas: `gopls` · `dlv` · `golangci-lint`
-
-### Rust
-
-Instalado con `rustup`. Toolchains: `stable` · `beta` · `nightly`
-
-Componentes: `clippy` · `rustfmt` · `rust-analyzer`
-
-Cargo tools: `cargo-audit` · `cargo-outdated` · `cargo-watch` · `cargo-expand` · `cargo-nextest`
-
-### Docker
-
-Docker Engine + Compose v2 desde repositorio oficial.
-
-```sh
-docker compose up -d
-docker compose logs -f
-```
-
-Stack de ejemplo en `~/docker-examples/webapp/compose.yml` (Node + PostgreSQL).
-
-### CLI Stack
-
-| Herramienta | Reemplaza | Función |
-|---|---|---|
-| `eza` | `ls` | Listado con iconos y colores |
-| `fd` | `find` | Búsqueda rápida |
-| `bat` | `cat` | Visualización con syntax highlighting |
-| `rg` (ripgrep) | `grep` | Búsqueda en contenido |
-| `fzf` | — | Fuzzy finder (`Ctrl+R`, `Ctrl+T`) |
-| `zoxide` | `cd` | Navegación por historial |
-| `yazi` | — | File manager TUI |
-| `lazygit` | — | Git TUI (`lg`) |
-| `lazydocker` | — | Docker TUI (`lzd`) |
-| `delta` | — | Pager de diffs para git |
-| `btop` | `top` | Monitor de recursos |
-| `tldr` | `man` | Manual resumido con ejemplos |
-| `glow` | — | Renderizado de Markdown en terminal |
-
-### Nerd Fonts
-
-Instaladas en `~/.local/share/fonts/`:
-
-| Fuente | Uso |
-|---|---|
-| JetBrainsMono Nerd Font | Por defecto en Ghostty |
-| FiraCode Nerd Font | Ligaduras de código |
-| CascadiaCode Nerd Font | Alternativa moderna |
-
-### Ghostty
-
-Terminal instalada desde el repositorio unofficial de Dario Griffo (`debian.griffo.io`).
-
-| Opción | Valor |
-|---|---|
-| Fuente | JetBrainsMono Nerd Font, tamaño 10 |
-| Tema | catppuccin-mocha |
-| Shell | `/usr/bin/zsh` |
-| Cursor | bloque, sin parpadeo |
-| Scrollback | 10 000 líneas |
-
----
-
-## Aliases principales
-
-| Alias | Comando |
-|---|---|
-| `ls` / `ll` / `lt` | `eza` con flags |
-| `cat` | `bat --style=auto` |
-| `find` | `fd` |
-| `grep` | `rg` |
-| `top` | `btop` |
-| `g` | `git` |
-| `lg` | `lazygit` |
-| `d` / `dc` | `docker` / `docker compose` |
-| `zj` | `zellij` |
-| `py` | `python3` |
-| `pip` / `venv` | `uv pip` / `uv venv` |
-| `reload` | `source ~/.zshrc` |
-
-## Funciones de shell
-
-| Función | Uso |
-|---|---|
-| `mkcd <dir>` | Crea directorio y entra en él |
-| `extract <archivo>` | Extrae cualquier formato comprimido |
-| `fcd` | Navega a directorio con fzf |
-| `gclone <url>` | Clona repo y entra en el directorio |
-
----
-
-## PATH (orden de precedencia)
-
-```
-~/.local/share/fnm      ← fnm (Node versions)
-~/.bun/bin              ← bun
-~/.local/share/pnpm     ← pnpm
-~/.cargo/bin            ← herramientas Rust
-~/go/bin                ← herramientas Go
-/usr/local/go/bin       ← compilador Go
-~/.local/bin            ← uv, zoxide, tldr
-```
+Variables útiles: `GO_VERSION=1.xx.x` fija la versión de Go; `SKIP_CARGO_TOOLS=1` omite la compilación de herramientas cargo.
