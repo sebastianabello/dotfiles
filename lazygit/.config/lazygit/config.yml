@@ -1,0 +1,18 @@
+# lazygit — usa delta como pager (igual que git)
+git:
+  paging:
+    colorArg: always
+    pager: delta --dark --paging=never
+gui:
+  nerdFontsVersion: "3"
+  showRandomTip: false
+  theme:
+    activeBorderColor:
+      - '#a6e3a1'
+      - bold
+    inactiveBorderColor:
+      - '#6c7086'
+    selectedLineBgColor:
+      - '#313244'
+os:
+  editPreset: nvim

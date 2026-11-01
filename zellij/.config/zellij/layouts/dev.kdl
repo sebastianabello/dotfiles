@@ -1,0 +1,16 @@
+// Layout de desarrollo: editor a la izquierda, terminal abajo a la derecha
+layout {
+    pane size=1 borderless=true {
+        plugin location="zellij:tab-bar"
+    }
+    pane split_direction="vertical" {
+        pane size="65%" name="editor"
+        pane size="35%" split_direction="horizontal" {
+            pane name="terminal"
+            pane size="30%" name="git" command="lazygit"
+        }
+    }
+    pane size=2 borderless=true {
+        plugin location="zellij:status-bar"
+    }
+}

@@ -2,12 +2,15 @@
 
 "$schema" = 'https://starship.rs/config-schema.json'
 
-# 1. TU FORMATO PERSONALIZADO EN DOS LÍNEAS (Expandido con soporte para todos los módulos)
+# Prompt en dos líneas. $all incluye todos los módulos activos de starship
+# (los que no aplican al directorio actual simplemente no se muestran).
 format = """
-[╭─](bold green)$username$hostname$directory$git_branch$git_commit$git_state$git_status$kubernetes$aws$azure$gcloud$openstack$docker_context$package$buf$bun$c$cpp$cmake$cobol$conda$container$crystal$dart$deno$direnv$dotnet$elixir$elm$erlang$fennel$fortran$gleam$golang$gradle$guix_shell$haskell$haxe$helm$java$julia$kotlin$lua$maven$memory_usage$meson$mojo$nats$netns$nim$nix_shell$nodejs$ocaml$odin$opa$purescript$python$raku$red$rlang$ruby$rust$scala$solidity$spack$sudo$swift$terraform$vlang$typst$vagrant$xmake$zig$status$shlvl$battery
+[╭─](bold green)$all
 [╰─](bold green)$character"""
 
-# 2. CONFIGURACIÓN DE TUS MÓDULOS PRINCIPALES (CON FORMATOS CORREGIDOS)
+# El salto de línea lo gestiona el format de arriba
+[line_break]
+disabled = true
 
 [username]
 style_user = "bold cyan"
@@ -36,7 +39,6 @@ format = "on [$symbol$branch]($style) "
 [git_status]
 style = "bold red"
 disabled = false
-format = '[✖ $status]($style) '
 
 [character]
 success_symbol = "[❯](bold green) "
@@ -118,11 +120,9 @@ symbol = " "
 symbol = " "
 
 [gcloud]
+disabled = true
 symbol = "󱇶 "
 format = 'on [$symbol$account(@$project)(\($region\))]($style) '
-
-[gcloud.region_aliases]
-europe-west4 = 'eu-w4'
 
 [gleam]
 symbol = " "
@@ -162,7 +162,7 @@ symbol = " "
 symbol = " "
 
 [kubernetes]
-disabled = false
+disabled = true
 symbol = "󱃾 "
 
 [lua]

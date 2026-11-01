@@ -1,15 +1,12 @@
-// zellij config.kdl — configuración mínima
+// zellij config.kdl
+// Prefijo estilo tmux: Ctrl b (por defecto). Ctrl g bloquea/desbloquea.
+// Se evita Ctrl a para no pisar el "inicio de línea" de readline/zsh.
 default_shell "zsh"
 pane_frames false
 mouse_mode true
 copy_on_select true
-
-keybinds clear-defaults=false {
-    normal {
-        bind "Ctrl a" { SwitchToMode "Tmux"; }
-    }
-}
+show_startup_tips false
 
 theme "catppuccin-mocha"
 
-layout_dir "~/.config/zellij/layouts"
+default_layout "dev"
