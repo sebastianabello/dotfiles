@@ -2,6 +2,12 @@
 gh/.config/gh/hosts.yml
 .ssh/
 .gnupg/
+.env*
+*.pem
+id_*
+
+# Estado de herramientas de IA
+.omc/
 
 # Backups generados por install.sh
 .dotfiles-backup/

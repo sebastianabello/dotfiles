@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # install.sh — Gestor de dotfiles con GNU Stow
-# Uso: ./install.sh [--all] [--dry-run] [módulo1 módulo2 ...]
+# Uso: ./install.sh [--all] [--dry-run] [--uninstall] [módulo1 módulo2 ...]
 set -euo pipefail
 
 RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'
@@ -16,9 +16,10 @@ BACKUP_DIR="${HOME}/.dotfiles-backup/$(date +%Y%m%d_%H%M%S)"
 DRY_RUN=false
 MODULES_TO_INSTALL=()
 INSTALL_ALL=false
+UNINSTALL=false
 
 # Autodetecta módulos: cualquier subdirectorio que no sea un directorio especial del repo
-SKIP_DIRS=("scripts" ".git")
+SKIP_DIRS=(".git" ".github" ".omc")
 AVAILABLE_MODULES=()
 for d in "$DOTFILES_DIR"/*/; do
     [[ ! -d "$d" ]] && continue
@@ -32,8 +33,9 @@ while [[ $# -gt 0 ]]; do
     case "$1" in
         --all)      INSTALL_ALL=true ;;
         --dry-run)  DRY_RUN=true ;;
+        --uninstall) UNINSTALL=true ;;
         --help|-h)
-            echo "Uso: $0 [--all] [--dry-run] [módulo1 módulo2 ...]"
+            echo "Uso: $0 [--all] [--dry-run] [--uninstall] [módulo1 módulo2 ...]"
             echo "Módulos disponibles: ${AVAILABLE_MODULES[*]}"
             exit 0 ;;
         -*) err "Flag desconocido: $1" ;;
@@ -60,6 +62,12 @@ backup_if_needed() {
         local dest
         dest=$(readlink -f "$target" 2>/dev/null || true)
         [[ "$dest" == "$DOTFILES_DIR"/* ]] && return 0  # ya gestionado por stow
+        # Symlink hacia otra ubicación: se retira (no hay contenido propio que respaldar)
+        if [[ "$dest" == */dotfiles/* ]]; then
+            if $DRY_RUN; then warn "[DRY-RUN] Reemplazaría symlink: $target → $dest"
+            else rm "$target"; warn "Symlink reemplazado: $target (apuntaba a $dest)"; fi
+            return 0
+        fi
     fi
 
     if ! $DRY_RUN; then
@@ -80,19 +88,31 @@ install_module() {
     info "Procesando módulo: $module"
 
     # Backup preventivo de todos los archivos que stow va a enlazar
-    while IFS= read -r src; do
-        local rel="${src#"$module_dir/"}"
-        backup_if_needed "$TARGET_DIR/$rel"
-    done < <(find "$module_dir" -type f -not -name '.gitignore')
+    if ! $UNINSTALL; then
+        while IFS= read -r src; do
+            local rel="${src#"$module_dir/"}"
+            backup_if_needed "$TARGET_DIR/$rel"
+        done < <(find "$module_dir" -type f)
+    fi
 
     local stow_flags=(--dir="$DOTFILES_DIR" --target="$TARGET_DIR" --restow)
+    if $UNINSTALL; then
+        local un=(--dir="$DOTFILES_DIR" --target="$TARGET_DIR" --delete)
+        $DRY_RUN && un+=(--simulate)
+        stow "${un[@]}" "$module" && log "Desinstalado: $module" || return 1
+        return 0
+    fi
     if $DRY_RUN; then
         stow --simulate "${stow_flags[@]}" "$module" \
             && info "[DRY-RUN] OK: $module" \
             || warn "[DRY-RUN] Conflicto en módulo: $module"
     else
-        stow "${stow_flags[@]}" "$module"
-        log "Instalado: $module"
+        if stow "${stow_flags[@]}" "$module"; then
+            log "Instalado: $module"
+        else
+            warn "Stow falló en: $module"
+            return 1
+        fi
     fi
 }
 
