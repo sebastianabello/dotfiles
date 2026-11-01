@@ -256,6 +256,7 @@ if ! has rustup && [[ ! -x "$USER_HOME/.cargo/bin/rustup" ]]; then
     info "Instalando Rust (rustup)..."
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable
 fi
+# shellcheck source=/dev/null
 set +u; . "$USER_HOME/.cargo/env"; set -u
 
 rustup component add clippy rustfmt rust-analyzer

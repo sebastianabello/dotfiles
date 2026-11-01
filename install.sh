@@ -103,9 +103,11 @@ install_module() {
         return 0
     fi
     if $DRY_RUN; then
-        stow --simulate "${stow_flags[@]}" "$module" \
-            && info "[DRY-RUN] OK: $module" \
-            || warn "[DRY-RUN] Conflicto en módulo: $module"
+        if stow --simulate "${stow_flags[@]}" "$module"; then
+            info "[DRY-RUN] OK: $module"
+        else
+            warn "[DRY-RUN] Conflicto en módulo: $module"
+        fi
     else
         if stow "${stow_flags[@]}" "$module"; then
             log "Instalado: $module"
