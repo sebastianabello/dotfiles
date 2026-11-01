@@ -21,6 +21,14 @@ return {
     -- Instala formateadores vía mason
     "WhoIsSethDaniel/mason-tool-installer.nvim",
     dependencies = { "mason-org/mason.nvim" },
-    opts = { ensure_installed = { "stylua", "shfmt", "prettier", "ruff", "tree-sitter-cli" } },
+    opts = {
+      ensure_installed = {
+        -- formateadores y herramientas
+        "stylua", "shfmt", "prettier", "ruff", "tree-sitter-cli",
+        -- servidores LSP (instalación desatendida con :MasonToolsInstallSync)
+        "lua-language-server", "bash-language-server", "pyright",
+        "typescript-language-server", "json-lsp",
+      },
+    },
   },
 }
