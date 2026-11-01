@@ -7,9 +7,25 @@ return {
   config = function()
     local ts = require("nvim-treesitter")
     local langs = {
-      "bash", "c", "css", "dockerfile", "go", "html", "javascript", "json",
-      "lua", "markdown", "markdown_inline", "python", "rust", "toml",
-      "tsx", "typescript", "vim", "vimdoc", "yaml",
+      "bash",
+      "c",
+      "css",
+      "dockerfile",
+      "go",
+      "html",
+      "javascript",
+      "json",
+      "lua",
+      "markdown",
+      "markdown_inline",
+      "python",
+      "rust",
+      "toml",
+      "tsx",
+      "typescript",
+      "vim",
+      "vimdoc",
+      "yaml",
     }
     ts.setup({})
     if vim.fn.executable("tree-sitter") == 1 then
@@ -21,7 +37,9 @@ return {
     end, {})
     -- Activar resaltado de treesitter si hay parser para el tipo de archivo
     vim.api.nvim_create_autocmd("FileType", {
-      callback = function() pcall(vim.treesitter.start) end,
+      callback = function()
+        pcall(vim.treesitter.start)
+      end,
     })
   end,
 }

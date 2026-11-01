@@ -3,7 +3,9 @@ local augroup = vim.api.nvim_create_augroup("user_config", { clear = true })
 -- Resaltar texto al copiarlo
 vim.api.nvim_create_autocmd("TextYankPost", {
   group = augroup,
-  callback = function() vim.hl.on_yank() end,
+  callback = function()
+    vim.hl.on_yank()
+  end,
 })
 
 -- Volver a la última posición al reabrir un archivo

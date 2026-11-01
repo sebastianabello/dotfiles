@@ -24,10 +24,17 @@ return {
     opts = {
       ensure_installed = {
         -- formateadores y herramientas
-        "stylua", "shfmt", "prettier", "ruff", "tree-sitter-cli",
+        "stylua",
+        "shfmt",
+        "prettier",
+        "ruff",
+        "tree-sitter-cli",
         -- servidores LSP (instalación desatendida con :MasonToolsInstallSync)
-        "lua-language-server", "bash-language-server", "pyright",
-        "typescript-language-server", "json-lsp",
+        "lua-language-server",
+        "bash-language-server",
+        "pyright",
+        "typescript-language-server",
+        "json-lsp",
       },
     },
   },

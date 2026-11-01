@@ -58,10 +58,14 @@ backup_if_needed() {
     local target="$1"
     [[ ! -e "$target" && ! -L "$target" ]] && return 0
 
+    # Ruta real, resolviendo también symlinks en directorios padre: stow "pliega"
+    # carpetas enteras (~/.config/nvim -> repo), y mover un archivo de ahí
+    # vaciaría el propio repo.
+    local dest
+    dest=$(readlink -f "$target" 2>/dev/null || true)
+    [[ "$dest" == "$DOTFILES_DIR"/* ]] && return 0  # ya gestionado por stow
+
     if [[ -L "$target" ]]; then
-        local dest
-        dest=$(readlink -f "$target" 2>/dev/null || true)
-        [[ "$dest" == "$DOTFILES_DIR"/* ]] && return 0  # ya gestionado por stow
         # Symlink hacia otra ubicación: se retira (no hay contenido propio que respaldar)
         if [[ "$dest" == */dotfiles/* ]]; then
             if $DRY_RUN; then warn "[DRY-RUN] Reemplazaría symlink: $target → $dest"
