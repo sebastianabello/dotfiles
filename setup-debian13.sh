@@ -362,7 +362,7 @@ has glow || {
 log "CLI moderno listo."
 
 # ─────────────────────────────────────────────────────────────────────────────
-section "9/10 · Nerd Fonts + Ghostty"
+section "9/10 · Nerd Fonts + Alacritty"
 # ─────────────────────────────────────────────────────────────────────────────
 
 FONTS_DIR="$USER_HOME/.local/share/fonts"
@@ -390,17 +390,11 @@ for font in "${!NERD_FONTS[@]}"; do
 done
 fc-cache -f "$FONTS_DIR"
 
-# Ghostty: repo no oficial de Dario Griffo para Debian
-# https://github.com/dariogriffo/ghostty-debian
-if ! has ghostty; then
-    info "Instalando Ghostty (repo debian.griffo.io)..."
-    sudo curl -fsSL https://debian.griffo.io/EA0F721D231FDD3A0A17B9AC7808B4DD62C41256.asc \
-        | sudo gpg --dearmor --yes -o /usr/share/keyrings/debian.griffo.io.gpg
-    echo "deb [signed-by=/usr/share/keyrings/debian.griffo.io.gpg] https://debian.griffo.io/apt ${VERSION_CODENAME} main" \
-        | sudo tee /etc/apt/sources.list.d/debian.griffo.io.list > /dev/null
-    sudo apt-get update -qq
-    sudo apt-get install -y ghostty \
-        || warn "No se pudo instalar Ghostty. Ver https://github.com/dariogriffo/ghostty-debian"
+# Alacritty: paquete oficial de Debian
+if ! has alacritty; then
+    info "Instalando Alacritty..."
+    sudo apt-get install -y alacritty \
+        || warn "No se pudo instalar Alacritty."
 fi
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -462,7 +456,7 @@ echo -e "  ${GREEN}Node.js${NC}    fnm + pnpm + bun"
 echo -e "  ${GREEN}Go / Rust${NC}  Go ${GO_VERSION} · rustup (stable/beta/nightly)"
 echo -e "  ${GREEN}Docker${NC}     Engine + Compose v2"
 echo -e "  ${GREEN}CLI${NC}        eza fd bat rg fzf zoxide yazi lazygit lazydocker delta btop tldr glow"
-echo -e "  ${GREEN}Terminal${NC}   Ghostty + Nerd Fonts"
+echo -e "  ${GREEN}Terminal${NC}   Alacritty + Nerd Fonts"
 echo ""
 echo -e "${YELLOW}Pasos manuales:${NC}"
 echo -e "  1. Cierra sesión y vuelve a entrar (grupo docker + zsh como shell)."
