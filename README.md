@@ -67,6 +67,7 @@ dotfiles/
 ├── nvim/       .config/nvim/  (Lua + lazy.nvim)
 ├── starship/   .config/starship.toml
 ├── alacritty/  .config/alacritty/alacritty.toml
+├── claude/     .claude/{settings.json, CLAUDE.md}
 ├── zellij/     .config/zellij/{config.kdl, layouts/dev.kdl}
 ├── lazygit/    .config/lazygit/config.yml
 ├── btop/       .config/btop/btop.conf
@@ -75,6 +76,7 @@ dotfiles/
 ```
 
 > `~/.config/gh/hosts.yml` (tokens OAuth) está excluido por `.gitignore`.
+> `claude/` versiona solo `settings.json` y `CLAUDE.md`; credenciales, historial y plugins de `~/.claude/` quedan fuera (stow enlaza archivos sueltos, no la carpeta).
 > Configuración propia de cada máquina (sin versionar): `~/.zshrc.local`.
 
 ### Añadir un módulo
