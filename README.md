@@ -156,7 +156,7 @@ Instalación desatendida: `make nvim-sync`.
 
 ## Terminal y multiplexor
 
-- **Alacritty**: tema Catppuccin Mocha, JetBrainsMono Nerd Font 12, cursor bloque (sin pestañas ni splits: de eso se encarga Zellij).
+- **Alacritty**: tema Nord, FiraCode Nerd Font 13, opacidad 0.92, cursor bloque (sin pestañas ni splits: de eso se encarga Zellij).
 - **Zellij**: prefijo `Ctrl b` (modo tmux), `Ctrl g` bloquea. Layout por defecto `dev` (editor + terminal + lazygit).
 
 ---

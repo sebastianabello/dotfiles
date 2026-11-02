@@ -1,4 +1,4 @@
-# Alacritty ≥ 0.13 (TOML). Tema Catppuccin Mocha incluido abajo.
+# Alacritty ≥ 0.13 (TOML). Tema Nord incluido abajo. Recarga solo al guardar.
 
 [env]
 TERM = "xterm-256color"
@@ -7,18 +7,20 @@ TERM = "xterm-256color"
 program = "/usr/bin/zsh"
 
 [window]
-padding = { x = 10, y = 8 }
+padding = { x = 14, y = 14 }
 decorations = "full"
 dynamic_title = true
+opacity = 0.92
+blur = true
 
 [scrolling]
 history = 10000
 
 [font]
-size = 12.0
-normal = { family = "JetBrainsMono Nerd Font", style = "Regular" }
-bold = { family = "JetBrainsMono Nerd Font", style = "Bold" }
-italic = { family = "JetBrainsMono Nerd Font", style = "Italic" }
+size = 13.0
+normal = { family = "FiraCode Nerd Font", style = "Regular" }
+bold = { family = "FiraCode Nerd Font", style = "Bold" }
+italic = { family = "FiraCode Nerd Font", style = "Regular" }
 
 [cursor]
 style = { shape = "Block", blinking = "Off" }
@@ -35,61 +37,60 @@ bindings = [
   { key = "F11", action = "ToggleFullscreen" },
 ]
 
-# ── Catppuccin Mocha ─────────────────────────────────────────────────────────
+# ── Nord ─────────────────────────────────────────────────────────────────────
 [colors.primary]
-background = "#1e1e2e"
-foreground = "#cdd6f4"
-dim_foreground = "#7f849c"
-bright_foreground = "#cdd6f4"
+background = "#2e3440"
+foreground = "#d8dee9"
+dim_foreground = "#a5abb6"
 
 [colors.cursor]
-text = "#1e1e2e"
-cursor = "#f5e0dc"
+text = "#2e3440"
+cursor = "#d8dee9"
 
 [colors.vi_mode_cursor]
-text = "#1e1e2e"
-cursor = "#b4befe"
-
-[colors.search.matches]
-foreground = "#1e1e2e"
-background = "#a6adc8"
-
-[colors.search.focused_match]
-foreground = "#1e1e2e"
-background = "#a6e3a1"
-
-[colors.footer_bar]
-foreground = "#1e1e2e"
-background = "#a6adc8"
-
-[colors.hints.start]
-foreground = "#1e1e2e"
-background = "#f9e2af"
-
-[colors.hints.end]
-foreground = "#1e1e2e"
-background = "#a6adc8"
+text = "#2e3440"
+cursor = "#d8dee9"
 
 [colors.selection]
-text = "#1e1e2e"
-background = "#f5e0dc"
+text = "CellForeground"
+background = "#4c566a"
+
+[colors.search.matches]
+foreground = "#2e3440"
+background = "#88c0d0"
+
+[colors.search.focused_match]
+foreground = "#2e3440"
+background = "#ebcb8b"
+
+[colors.footer_bar]
+foreground = "#2e3440"
+background = "#d8dee9"
+
+[colors.hints.start]
+foreground = "#2e3440"
+background = "#ebcb8b"
+
+[colors.hints.end]
+foreground = "#2e3440"
+background = "#d8dee9"
 
 [colors.normal]
-black = "#45475a"
-red = "#f38ba8"
-green = "#a6e3a1"
-yellow = "#f9e2af"
-blue = "#89b4fa"
-magenta = "#f5c2e7"
-cyan = "#94e2d5"
-white = "#bac2de"
+black = "#3b4252"
+red = "#bf616a"
+green = "#a3be8c"
+yellow = "#ebcb8b"
+blue = "#81a1c1"
+magenta = "#b48ead"
+cyan = "#88c0d0"
+white = "#e5e9f0"
 
 [colors.bright]
-black = "#585b70"
-red = "#f38ba8"
-green = "#a6e3a1"
-yellow = "#f9e2af"
-blue = "#89b4fa"
-magenta = "#f5c2e7"
-cyan = "#94e2d5"
-white = "#a6adc8"
+black = "#4c566a"
+red = "#bf616a"
+green = "#a3be8c"
+yellow = "#ebcb8b"
+blue = "#81a1c1"
+magenta = "#b48ead"
+cyan = "#8fbcbb"
+white = "#eceff4"
