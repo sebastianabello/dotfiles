@@ -92,6 +92,17 @@ alias g='git'
 alias lg='lazygit'
 alias gst='git status'
 alias glog='git log --oneline --graph --decorate'
+# El plugin git de oh-my-zsh ya define ga gaa gp gl gd gb gco gsw; aquí solo lo que falta.
+alias gs='git status -sb'
+cm()  { git commit -m "$*"; }                    # cm mensaje sin comillas
+cma() { git add -A && git commit -m "$*"; }
+
+# npm
+alias nd='npm run dev'
+alias nb='npm run build'
+alias ns='npm start'
+alias ni='npm install'
+alias nt='npm test'
 
 alias d='docker'
 alias dc='docker compose'

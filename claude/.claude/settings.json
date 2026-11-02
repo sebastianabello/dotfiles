@@ -7,6 +7,11 @@
     "pr": ""
   },
   "model": "sonnet",
+  "statusLine": {
+    "type": "command",
+    "command": "node \"$HOME/.claude/statusline.js\"",
+    "refreshInterval": 5
+  },
   "enabledPlugins": {
     "gopls-lsp@claude-plugins-official": true,
     "telegram@claude-plugins-official": true,

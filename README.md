@@ -67,7 +67,7 @@ dotfiles/
 ├── nvim/       .config/nvim/  (Lua + lazy.nvim)
 ├── starship/   .config/starship.toml
 ├── alacritty/  .config/alacritty/alacritty.toml
-├── claude/     .claude/{settings.json, CLAUDE.md}
+├── claude/     .claude/{settings.json, CLAUDE.md, statusline.js}
 ├── zellij/     .config/zellij/{config.kdl, layouts/dev.kdl}
 ├── lazygit/    .config/lazygit/config.yml
 ├── btop/       .config/btop/btop.conf
@@ -76,7 +76,7 @@ dotfiles/
 ```
 
 > `~/.config/gh/hosts.yml` (tokens OAuth) está excluido por `.gitignore`.
-> `claude/` versiona solo `settings.json` y `CLAUDE.md`; credenciales, historial y plugins de `~/.claude/` quedan fuera (stow enlaza archivos sueltos, no la carpeta).
+> `claude/` versiona `settings.json`, `CLAUDE.md` y la statusline; credenciales, historial y plugins de `~/.claude/` quedan fuera (stow enlaza archivos sueltos, no la carpeta).
 > Configuración propia de cada máquina (sin versionar): `~/.zshrc.local`.
 
 ### Añadir un módulo
@@ -138,6 +138,8 @@ Instalación desatendida: `make nvim-sync`.
 | `d` `dc` | `docker` · `docker compose` |
 | `zj` | `zellij` |
 | `py` `venv` `uvp` | `python3` · `uv venv` · `uv pip` |
+| `gs` · `cm` · `cma` | `git status -sb` · commit con mensaje sin comillas · add -A + commit |
+| `nd` `nb` `ns` `ni` `nt` | `npm run dev` · `build` · `start` · `install` · `test` |
 | `reload` | `exec zsh` |
 
 `find`, `grep` y `pip` **no** están aliasados, para no romper scripts POSIX.
@@ -147,6 +149,10 @@ Instalación desatendida: `make nvim-sync`.
 `mkcd <dir>` · `extract <archivo>` · `fcd` (cd con fzf) · `gclone <url>`
 
 ---
+
+## Claude Code
+
+`claude/.claude/statusline.js` (adaptada de [fazt/dotfiles](https://github.com/fazt/dotfiles), con paleta Catppuccin) dibuja usuario, ruta, rama git (`✗` si hay cambios), modelo y barras de contexto y de cuota 5h/7d. Necesita `node` (lo instala fnm).
 
 ## Terminal y multiplexor
 
