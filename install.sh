@@ -100,6 +100,9 @@ install_module() {
     fi
 
     local stow_flags=(--dir="$DOTFILES_DIR" --target="$TARGET_DIR" --restow)
+    # ~/.claude guarda historial y credenciales: nunca debe plegarse a un symlink
+    # hacia el repo, o Claude Code escribiría esos datos dentro del clon.
+    [[ "$module" == "claude" ]] && stow_flags+=(--no-folding)
     if $UNINSTALL; then
         local un=(--dir="$DOTFILES_DIR" --target="$TARGET_DIR" --delete)
         $DRY_RUN && un+=(--simulate)
