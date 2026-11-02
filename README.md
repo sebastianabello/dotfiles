@@ -152,7 +152,7 @@ Instalación desatendida: `make nvim-sync`.
 
 ## Claude Code
 
-`claude/.claude/statusline.js` (adaptada de [fazt/dotfiles](https://github.com/fazt/dotfiles), con paleta Catppuccin) dibuja usuario, ruta, rama git (`✗` si hay cambios), modelo y barras de contexto y de cuota 5h/7d. Necesita `node` (lo instala fnm).
+`claude/.claude/statusline.js` (adaptada de [fazt/dotfiles](https://github.com/fazt/dotfiles), dibuja en una sola línea, con iconos Nerd Font y paleta Nord: ruta, rama git (`✗` si hay cambios), modelo, contexto usado y cuota 5h/7d. Necesita `node` (lo instala fnm).
 
 ## Terminal y multiplexor
 

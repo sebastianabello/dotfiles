@@ -1,13 +1,11 @@
 #!/usr/bin/env node
-// Claude Code statusline (basada en fazt/dotfiles, paleta Catppuccin Mocha)
+// Claude Code statusline — una sola línea, con iconos Nerd Font y paleta Nord.
 //
-// Line 1:               @usuario  ➜  path  git(branch ✗)  [vim mode]
-// Line 2 (claude info): Model | ctx bar N%/size
-// Line 3 (5h quota):            | 5h  bar N% + reset time   (omitted if absent)
-// Line 4 (7d quota):            | 7d  bar N% + reset time   (omitted if absent)
+//    ruta    rama ✗  │   modelo  │   ctx 42%/1M  │   5h 16% ⟳01:13  7d 65% ⟳jue 12:33
 //
-// The three bars mean the same thing: filled = consumed, N% = consumed, and
-// color goes green (<60%), orange (>=60%), red (>=80%).
+// Cada icono va seguido de un espacio (el glifo se dibuja ocupando esa celda) y
+// los segmentos se separan con "  │  ", para que nada quede pegado ni encima.
+// Verde < 60 %, naranja >= 60 %, rojo >= 80 % de lo consumido (ctx, 5h y 7d).
 
 const { spawnSync } = require('child_process');
 
@@ -17,193 +15,97 @@ process.stdin.on('end', () => {
   let data = {};
   try { data = JSON.parse(Buffer.concat(chunks).toString()); } catch (_) {}
 
-  // ── ANSI color helpers (truecolor to match zash palette) ─────────────────
-  const RESET   = '\x1b[0m';
-  const DIM     = '\x1b[2m';
-  const WHITE   = '\x1b[97m';
-  // Catppuccin Mocha
-  const RED     = '\x1b[38;2;243;139;168m';
-  const GREEN   = '\x1b[38;2;166;227;161m';
-  const CYAN    = '\x1b[38;2;148;226;213m';
-  const PURPLE  = '\x1b[38;2;203;166;247m';
-  const GOLD    = '\x1b[38;2;249;226;175m';
-  const YELLOW  = '\x1b[38;2;249;226;175m';
-  // secondary info colors
-  const LGRAY   = '\x1b[38;2;166;173;200m';
-  const LGREEN  = '\x1b[38;2;166;227;161m';
-  const ORANGE  = '\x1b[38;2;250;179;135m';
-  const CRED    = '\x1b[38;2;243;139;168m';
+  // ── Colores (Nord, truecolor) ──────────────────────────────────────────────
+  const c = (r, g, b) => `\x1b[38;2;${r};${g};${b}m`;
+  const RESET = '\x1b[0m';
+  const DIM   = '\x1b[2m';
+  const CYAN   = c(136, 192, 208);   // ruta
+  const PURPLE = c(180, 142, 173);   // rama
+  const YELLOW = c(235, 203, 139);   // cambios sin commitear
+  const BLUE   = c(129, 161, 193);   // modelo
+  const TEXT   = c(216, 222, 233);
+  const GREEN  = c(163, 190, 140);
+  const ORANGE = c(208, 135, 112);
+  const RED    = c(191, 97, 106);
 
-  // ── Data extraction ───────────────────────────────────────────────────────
-  const userName  = process.env.USER || process.env.USERNAME || 'user';
-  const cwdRaw    = data?.workspace?.current_dir ?? data?.cwd ?? process.cwd();
-  const homedir   = process.env.HOME || process.env.USERPROFILE || '';
+  // ── Iconos Nerd Font (por código, para no depender de la codificación) ─────
+  const I = {
+    folder: '', branch: '', model: '',
+    ctx: '', clock: '',
+  };
+  const seg = (color, icon, text) => `${color}${icon} ${RESET}${TEXT}${text}${RESET}`;
+  const SEP = `  ${DIM}│${RESET}  `;
 
-  // full-ish path: collapse home to ~, keep the last 3 segments
-  let fullPath = (cwdRaw || '').replace(/\\/g, '/');
-  const homeNorm = homedir.replace(/\\/g, '/');
-  if (homeNorm && fullPath.toLowerCase().startsWith(homeNorm.toLowerCase())) {
-    fullPath = '~' + fullPath.slice(homeNorm.length);
-  }
-  const segs = fullPath.split('/').filter(Boolean);
-  const shortPath = segs.length > 3
-    ? '…/' + segs.slice(-3).join('/')
-    : fullPath;
+  // ── Datos ──────────────────────────────────────────────────────────────────
+  const cwd  = data?.workspace?.current_dir ?? data?.cwd ?? process.cwd();
+  const home = process.env.HOME || process.env.USERPROFILE || '';
+  let p = (cwd || '').replace(/\\/g, '/');
+  const h = home.replace(/\\/g, '/');
+  if (h && p.toLowerCase().startsWith(h.toLowerCase())) p = '~' + p.slice(h.length);
+  const parts = p.split('/').filter(Boolean);
+  const shortPath = parts.length > 3 ? '…/' + parts.slice(-3).join('/') : p;
 
-  const model     = data?.model?.display_name ?? data?.model?.id ?? 'Claude';
-  const usedPct   = data?.context_window?.used_percentage;
-  const ctxSize   = data?.context_window?.context_window_size;
-  const vimMode   = data?.vim?.mode ?? null;
-  const rl        = data?.rate_limits;
+  const model   = data?.model?.display_name ?? data?.model?.id ?? 'Claude';
+  const usedPct = data?.context_window?.used_percentage;
+  const ctxSize = data?.context_window?.context_window_size;
+  const vimMode = data?.vim?.mode ?? null;
+  const rl      = data?.rate_limits;
 
-  // ── Git branch ────────────────────────────────────────────────────────────
-  // Claude Code does not send the current branch (workspace.repo.name is the
-  // repo name, worktree.branch only exists in --worktree sessions), so ask git.
   function git(args) {
-    const r = spawnSync('git', ['-C', cwdRaw, ...args], {
-      encoding: 'utf8',
-      timeout: 800,
-      });
-    if (r.status !== 0 || !r.stdout) return null;
-    return r.stdout.trim();
+    const r = spawnSync('git', ['-C', cwd, ...args], { encoding: 'utf8', timeout: 800 });
+    return r.status === 0 && r.stdout ? r.stdout.trim() : null;
   }
-
-  let branch = data?.worktree?.branch ?? null;
-  let dirty  = false;
-  if (!branch) {
-    branch = git(['rev-parse', '--abbrev-ref', 'HEAD']);
-    if (branch === 'HEAD') {
-      const sha = git(['rev-parse', '--short', 'HEAD']);
-      branch = sha ? `detached@${sha}` : null;
-    }
+  let branch = data?.worktree?.branch ?? git(['rev-parse', '--abbrev-ref', 'HEAD']);
+  if (branch === 'HEAD') {
+    const sha = git(['rev-parse', '--short', 'HEAD']);
+    branch = sha ? `detached@${sha}` : null;
   }
-  if (branch) {
-    const status = git(['status', '--porcelain']);
-    dirty = !!(status && status.length);
-  }
-  const wtName = data?.workspace?.git_worktree ?? data?.worktree?.name ?? null;
+  const dirty = branch ? !!git(['status', '--porcelain']) : false;
 
-  // ── Line 1: zash-style prompt ─────────────────────────────────────────────
-  // Identidad al inicio de la linea: el correo de la cuenta con la sesion
-  // iniciada, coloreado por cuenta para distinguirla de un vistazo (dominio
-  // desconocido en gris). Sustituye al @usuario del sistema, que en esta
-  // maquina siempre es el mismo; solo si no se puede determinar la cuenta se
-  // cae a @usuario.
-  const userPart = `${RED}@${userName}${RESET}`;
-  const arrow    = `${GREEN}➜${RESET}`;
-  const dirPart  = `${CYAN}${shortPath}${RESET}`;
+  const pct   = v => Math.max(0, Math.min(100, Math.round(v)));
+  const color = n => (n >= 80 ? RED : n >= 60 ? ORANGE : GREEN);
 
-  let gitPart = '';
-  if (branch) {
-    const mark = dirty ? ` ${YELLOW}✗${RESET}` : '';
-    const wt   = wtName ? `${DIM}:${wtName}${RESET}` : '';
-    gitPart = ` ${GOLD}git(${RESET}${PURPLE}${branch}${RESET}${wt}${mark}${GOLD})${RESET}`;
-  }
-
-  let statusPart = '';
-  if (vimMode) {
-    const modeColors = {
-      'INSERT':      '\x1b[32m',  // green
-      'NORMAL':      '\x1b[34m',  // blue
-      'VISUAL':      '\x1b[33m',  // yellow
-      'VISUAL LINE': '\x1b[33m',
-    };
-    const mc = modeColors[vimMode] || WHITE;
-    statusPart = ` ${mc}[${vimMode}]${RESET}`;
-  }
-
-  const line1 = `${userPart} ${arrow} ${dirPart}${gitPart}${statusPart}`;
-
-  // ── Line 2: Claude info ───────────────────────────────────────────────────
-  const sep = ` ${DIM}|${RESET} `;
-
-  const modelPart = `${WHITE}${model}${RESET}`;
-
-  // Barra delgada: tramo lleno con ━ (coloreado) y tramo vacio con ─ (tenue).
-  const BAR_WIDTH = 20;   // 5% por celda
-  // Etiquetas rellenadas al mismo ancho para que las tres barras arranquen en
-  // la misma columna y se comparen de un vistazo.
-  const LABEL_W  = 3;     // "ctx", la mas larga ("5h" y "7d" se rellenan)
-  const barLabel = s => `${LGRAY}${s.padEnd(LABEL_W)}${RESET}`;
-  const clampPct = v => Math.max(0, Math.min(100, Math.round(v)));
-  // Color por consumo, comun a las tres barras (lleno = gastado): verde hasta
-  // 60%, naranja desde 60% y rojo desde 80%.
-  const usageColor = n => n >= 80 ? CRED : n >= 60 ? ORANGE : LGREEN;
-  function thinBar(pct, color) {
-    const filled = Math.round((clampPct(pct) / 100) * BAR_WIDTH);
-    return `${color}${'━'.repeat(filled)}${RESET}${DIM}${'─'.repeat(BAR_WIDTH - filled)}${RESET}`;
-  }
-  const emptyBar = `${DIM}${'─'.repeat(BAR_WIDTH)}${RESET}`;
-
-  // context usage: barra delgada que se LLENA a medida que se consume
-  let ctxPart;
-  if (usedPct != null) {
-    const n = clampPct(usedPct);
-    const color = usageColor(n);
-    const sizeLabel = !ctxSize ? '' :
-      ctxSize >= 1000000 ? `${+(ctxSize / 1000000).toFixed(1)}M`
-                         : `${Math.round(ctxSize / 1000)}k`;
-    const size = sizeLabel ? `${DIM}/${sizeLabel}${RESET}` : '';
-    ctxPart = `${barLabel('ctx')} ${thinBar(n, color)} ${color}${n}%${RESET}${size}`;
-  } else {
-    ctxPart = `${barLabel('ctx')} ${emptyBar} ${DIM}-${RESET}`;
-  }
-
-  // Hora absoluta del reset, no cuenta regresiva: la status line solo se
-  // redibuja cuando llega un mensaje, asi que un "1h51m" se queda viejo
-  // mientras la sesion esta quieta, mientras que una hora fija sigue siendo
-  // correcta. Se agrega el dia cuando el reset no cae hoy.
+  // Hora absoluta del reset (una cuenta atrás se quedaría vieja entre repintados).
   function resetAt(epochSec) {
     if (!epochSec) return '';
     const d = new Date(epochSec * 1000);
     if (Number.isNaN(d.getTime())) return '';
-
-    const hhmm = d.toLocaleTimeString('es-ES', {
-      hour: '2-digit', minute: '2-digit', hour12: false,
-    });
-
-    const now = new Date();
-    const startOfDay = x => new Date(x.getFullYear(), x.getMonth(), x.getDate());
-    const days = Math.round((startOfDay(d) - startOfDay(now)) / 86400000);
+    const hhmm = d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false });
+    const day  = x => new Date(x.getFullYear(), x.getMonth(), x.getDate());
+    const days = Math.round((day(d) - day(new Date())) / 86400000);
     if (days <= 0) return hhmm;
     if (days < 7) {
-      const wd = d.toLocaleDateString('es-ES', { weekday: 'short' })
-        .replace('.', '').slice(0, 3);
-      return `${wd} ${hhmm}`;
+      return `${d.toLocaleDateString('es-ES', { weekday: 'short' }).replace('.', '').slice(0, 3)} ${hhmm}`;
     }
     return `${d.getDate()}/${d.getMonth() + 1} ${hhmm}`;
   }
 
-  // Barra de una ventana de cuota de suscripcion. Igual que ctx: lleno =
-  // consumido. La barra, el numero y el color salen del mismo porcentaje
-  // consumido (used_percentage) y usan los mismos cortes (usageColor). Cada
-  // ventana tiene su propia hora de reinicio. rate_limits solo llega a
-  // suscriptores Pro/Max y recien despues de la primera respuesta de la API,
-  // asi que cada ventana puede faltar por separado: en ese caso devuelve null
-  // y esa linea no se dibuja.
-  function quotaLine(label, window) {
-    if (!window) return null;
-    const used = window.used_percentage;
-    if (typeof used !== 'number' || !Number.isFinite(used)) return null;
-    const n     = clampPct(used);
-    const color = usageColor(n);
-    const at    = resetAt(window.resets_at);
-    const reset = at ? ` ⟳${DIM}${at}${RESET}` : '';
-    return `${barLabel(label)} ${thinBar(n, color)} ${color}${n}%${RESET}${reset}`;
+  // ── Segmentos ──────────────────────────────────────────────────────────────
+  const out = [];
+
+  let first = `${CYAN}${I.folder} ${RESET}${CYAN}${shortPath}${RESET}`;
+  if (branch) {
+    first += `  ${PURPLE}${I.branch} ${branch}${RESET}`;
+    if (dirty) first += ` ${YELLOW}✗${RESET}`;
+  }
+  if (vimMode) first += `  ${DIM}[${vimMode}]${RESET}`;
+  out.push(first);
+
+  out.push(`${BLUE}${I.model} ${RESET}${TEXT}${model}${RESET}`);
+
+  if (usedPct != null) {
+    const n = pct(usedPct);
+    const size = !ctxSize ? '' : ctxSize >= 1e6 ? `/${+(ctxSize / 1e6).toFixed(1)}M` : `/${Math.round(ctxSize / 1000)}k`;
+    out.push(`${color(n)}${I.ctx} ${RESET}${TEXT}ctx ${RESET}${color(n)}${n}%${RESET}${DIM}${size}${RESET}`);
   }
 
-  // Una barra por linea: contexto, 5h y 7d. Las de cuota solo se dibujan si su
-  // ventana llego; sin rate_limits queda unicamente la de contexto.
-  const rows = [
-    ctxPart,
-    quotaLine('5h', rl?.five_hour),
-    quotaLine('7d', rl?.seven_day),
-  ].filter(Boolean);
+  const quota = [['5h', rl?.five_hour], ['7d', rl?.seven_day]].flatMap(([label, w]) => {
+    if (!w || typeof w.used_percentage !== 'number' || !Number.isFinite(w.used_percentage)) return [];
+    const n = pct(w.used_percentage);
+    const at = resetAt(w.resets_at);
+    return [`${TEXT}${label} ${RESET}${color(n)}${n}%${RESET}${at ? ` ${DIM}⟳ ${at}${RESET}` : ''}`];
+  });
+  if (quota.length) out.push(`${YELLOW}${I.clock} ${RESET}${quota.join('   ')}`);
 
-  // El modelo va en la primera fila; en las demas se rellena con el ancho
-  // visible del modelo para que el "|" y las barras queden alineados.
-  const indent = ' '.repeat([...String(model)].length);
-  const lines  = rows.map((row, i) => `${i === 0 ? modelPart : indent}${sep}${row}`);
-
-  process.stdout.write([line1, ...lines].join('\n') + '\n');
+  process.stdout.write(out.join(SEP) + '\n');
 });
