@@ -1,0 +1,30 @@
+# ─────────────────────────────────────────────────────
+# Ghostty config — se carga desde config.ghostty (1.2+)
+# Los atajos ctrl+shift+c/v/t/w/+/-/0 ya son los de por defecto en Linux.
+# ─────────────────────────────────────────────────────
+
+# Tema y fuente (Nerd Font instalada por setup-debian13.sh)
+theme = Catppuccin Mocha
+font-family = JetBrainsMono Nerd Font
+font-size = 12
+font-feature = calt    # ligaduras contextuales
+font-feature = liga    # ligaduras estándar
+
+# Ventana
+window-padding-x = 10
+window-padding-y = 8
+unfocused-split-opacity = 0.9
+
+# Cursor
+cursor-style = block
+cursor-style-blink = false
+
+# Integración con shell (OSC 133 para prompts)
+shell-integration = zsh
+shell-integration-features = cursor,sudo,title
+
+# Copiar al seleccionar
+copy-on-select = clipboard
+
+# Scrollback
+scrollback-limit = 10000

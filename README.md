@@ -66,7 +66,7 @@ dotfiles/
 ├── git/        .gitconfig
 ├── nvim/       .config/nvim/  (Lua + lazy.nvim)
 ├── starship/   .config/starship.toml
-├── alacritty/  .config/alacritty/alacritty.toml
+├── ghostty/    .config/ghostty/config.ghostty
 ├── claude/     .claude/{settings.json, CLAUDE.md, statusline.js}
 ├── zellij/     .config/zellij/{config.kdl, layouts/dev.kdl}
 ├── lazygit/    .config/lazygit/config.yml
@@ -156,7 +156,7 @@ Instalación desatendida: `make nvim-sync`.
 
 ## Terminal y multiplexor
 
-- **Alacritty**: tema Nord, FiraCode Nerd Font 13, opacidad 0.92, cursor bloque (sin pestañas ni splits: de eso se encarga Zellij).
+- **Ghostty**: tema Catppuccin Mocha, JetBrainsMono Nerd Font 12, cursor bloque. Se instala desde el `.deb` de Debian 13 publicado en GitHub (`dariogriffo/ghostty-debian`).
 - **Zellij**: prefijo `Ctrl b` (modo tmux), `Ctrl g` bloquea. Layout por defecto `dev` (editor + terminal + lazygit).
 
 ---
@@ -174,6 +174,6 @@ Instalación desatendida: `make nvim-sync`.
 | Docker | Engine + Compose v2 (repo oficial) |
 | CLI | eza, fd, bat, ripgrep, fzf, zoxide, yazi, lazygit, lazydocker, delta, btop, tldr, glow |
 | Fuentes | JetBrainsMono, FiraCode, CascadiaCode (Nerd Fonts) |
-| Apps | Alacritty, Brave |
+| Apps | Ghostty, Brave |
 
 Variables útiles: `GO_VERSION=1.xx.x` fija la versión de Go; `SKIP_CARGO_TOOLS=1` omite la compilación de herramientas cargo.

@@ -362,7 +362,7 @@ has glow || {
 log "CLI moderno listo."
 
 # ─────────────────────────────────────────────────────────────────────────────
-section "9/10 · Nerd Fonts + Alacritty"
+section "9/10 · Nerd Fonts + Ghostty"
 # ─────────────────────────────────────────────────────────────────────────────
 
 FONTS_DIR="$USER_HOME/.local/share/fonts"
@@ -390,11 +390,19 @@ for font in "${!NERD_FONTS[@]}"; do
 done
 fc-cache -f "$FONTS_DIR"
 
-# Alacritty: paquete oficial de Debian
-if ! has alacritty; then
-    info "Instalando Alacritty..."
-    sudo apt-get install -y alacritty \
-        || warn "No se pudo instalar Alacritty."
+# Ghostty: .deb para Debian 13 publicado en GitHub Releases (dariogriffo/ghostty-debian).
+# Se descarga el archivo directamente: el repo apt debian.griffo.io devuelve 401.
+if ! has ghostty; then
+    info "Instalando Ghostty..."
+    GH_TAG="$(latest_tag dariogriffo/ghostty-debian)"                 # p. ej. 1.4.0+2
+    GH_FILE="ghostty_${GH_TAG//+/-}.${VERSION_CODENAME}_${ARCH_ALT}.deb" # ghostty_1.4.0-2.trixie_amd64.deb
+    if curl -fsSLo "$TMP/$GH_FILE" \
+        "https://github.com/dariogriffo/ghostty-debian/releases/download/${GH_TAG//+/%2B}/${GH_FILE}"; then
+        sudo apt-get install -y "$TMP/$GH_FILE" \
+            || warn "No se pudo instalar Ghostty."
+    else
+        warn "No se pudo descargar $GH_FILE. Ver https://github.com/dariogriffo/ghostty-debian/releases"
+    fi
 fi
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -456,7 +464,7 @@ echo -e "  ${GREEN}Node.js${NC}    fnm + pnpm + bun"
 echo -e "  ${GREEN}Go / Rust${NC}  Go ${GO_VERSION} · rustup (stable/beta/nightly)"
 echo -e "  ${GREEN}Docker${NC}     Engine + Compose v2"
 echo -e "  ${GREEN}CLI${NC}        eza fd bat rg fzf zoxide yazi lazygit lazydocker delta btop tldr glow"
-echo -e "  ${GREEN}Terminal${NC}   Alacritty + Nerd Fonts"
+echo -e "  ${GREEN}Terminal${NC}   Ghostty + Nerd Fonts"
 echo ""
 echo -e "${YELLOW}Pasos manuales:${NC}"
 echo -e "  1. Cierra sesión y vuelve a entrar (grupo docker + zsh como shell)."
